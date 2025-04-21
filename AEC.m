@@ -1,32 +1,31 @@
-function AEC=AEC(a)
+function AEC = AEC_new(a)
 % a is a filtered multichannel signal (time x channels)
 
-N=size(a,2);
-AEC(1:N,1:N)=0;
-complex_a=hilbert(a);
+N = size(a, 2);
+AEC = zeros(N, N);
 
-for i=1:N
-    for j=1:N
-        if i<j
-        
-        ort1=orthog_timedomain(a(:,i),a(:,j));
-        complex_ort1=abs(hilbert(ort1));
-        AEC1=abs(corrcoef(complex_ort1,abs(complex_a(:,i))));
-        
-        ort2=orthog_timedomain(a(:,j),a(:,i));
-        complex_ort2=abs(hilbert(ort2));
-        AEC2=abs(corrcoef(complex_ort2,abs(complex_a(:,j))));
-        
-        AEC_mean=(AEC1(1,2)+AEC2(1,2))/2;
-        
-        AEC(i,j)=AEC_mean;          
-        
-        
-        AEC(j,i)=AEC(i,j);
-        
-        end
-        
-    end
+% Compute envelope per channel
+amp = zeros(size(a));
+for ch = 1:N
+    amp(:, ch) = envelope(a(:, ch), 1, 'analytic');
 end
 
+for i = 1:N
+    for j = i+1:N
+        % i -> j
+        ort1 = orthog_timedomain(a(:,i), a(:,j));
+        amp_ort1 = envelope(ort1, 1, 'analytic');
+        AEC1 = abs(corrcoef(amp_ort1, amp(:,i)));
+
+        % j -> i
+        ort2 = orthog_timedomain(a(:,j), a(:,i));
+        amp_ort2 = envelope(ort2, 1, 'analytic');
+        AEC2 = abs(corrcoef(amp_ort2, amp(:,j)));
+
+        AEC_mean = (AEC1(1,2) + AEC2(1,2)) / 2;
+
+        AEC(i,j) = AEC_mean;
+        AEC(j,i) = AEC_mean;  % symmetry
+    end
+end
 end
