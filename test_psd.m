@@ -1,8 +1,8 @@
-nc=64; % number of channels
-T = 1; % Length of timeseries in seconds
+nc=2; % number of channels
+T = 2; % Length of timeseries in seconds
 fs = 256; % Sample rate of timeseries
 ns=round(T*fs);
-nt=10; %trials
+nt=100; %trials
 f0 = [8;20]; % two frequencies
 df = 1/T;
 PRtot=linspace(1,2,100); % ratio of power of second frequency wrt first one
